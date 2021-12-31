@@ -1,0 +1,3 @@
+[submodule "modules/svelte"]
+	path = modules/svelte
+	url = git@github.com:sveltejs/svelte.git
