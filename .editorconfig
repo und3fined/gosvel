@@ -1,0 +1,22 @@
+##
+# File: .editorconfig
+# Project: gosvel
+# File Created: 31 Dec 2021 10:40:40
+# Author: und3fined (me@und3fined.com)
+# -----
+# Last Modified: 31 Dec 2021 10:40:45
+# Modified By: und3fined (me@und3fined.com)
+# -----
+# Copyright (c) 2021 und3fined.com
+##
+
+# top-most EditorConfig file
+root = true
+
+[*]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = false
+insert_final_newline = false
