@@ -1,0 +1,8 @@
+{
+  "name": "Default",
+  "target": "#govel",
+  "site": {
+    "title": "Home",
+    "description": "The default theme"
+  }
+}

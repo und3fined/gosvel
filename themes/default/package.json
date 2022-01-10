@@ -1,0 +1,7 @@
+{
+  "name": "gosvel-default",
+  "version": "0.0.0",
+  "devDependencies": {
+    "svelte": "^3.45.0"
+  }
+}
