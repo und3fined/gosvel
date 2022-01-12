@@ -1,30 +1,59 @@
-<script>
-	export let name;
+<script context="module" lang="ts">
+	export const prerender = true;
 </script>
 
-<main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
-</main>
+<script lang="ts">
+	import Counter from '$lib/Counter.svelte';
+</script>
+
+<svelte:head>
+	<title>Home</title>
+</svelte:head>
+
+<section>
+	<h1>
+		<div class="welcome">
+			<picture>
+				<source srcset="svelte-welcome.webp" type="image/webp" />
+				<img src="svelte-welcome.png" alt="Welcome" />
+			</picture>
+		</div>
+
+		to your new<br />SvelteKit app
+	</h1>
+
+	<h2>
+		try editing <strong>client/src/routes/index.svelte</strong> and <strong>re-compile</strong> code
+	</h2>
+
+	<Counter />
+</section>
 
 <style>
-	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
+	section {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		flex: 1;
 	}
 
 	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
+		width: 100%;
 	}
 
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
+	.welcome {
+		position: relative;
+		width: 100%;
+		height: 0;
+		padding: 0 0 calc(100% * 495 / 2048) 0;
+	}
+
+	.welcome img {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		display: block;
 	}
 </style>

@@ -4,7 +4,7 @@
  * File Created: 11 Jan 2022 20:39:41
  * Author: und3fined (me@und3fined.com)
  * -----
- * Last Modified: 11 Jan 2022 23:50:13
+ * Last Modified: 12 Jan 2022 17:43:22
  * Modified By: und3fined (me@und3fined.com)
  * -----
  * Copyright (c) 2022 und3fined.com
@@ -12,17 +12,22 @@
 package manifest
 
 import (
-	"path"
-
-	"gosvel/tools/kit/config"
+	"encoding/json"
+	"fmt"
 	"gosvel/tools/kit/utils/filepath"
+	"log"
+	"os"
 )
 
 type Manifest struct {
 	opts *options
 
+	defaultLayout string
+	defaultError  string
+
+	items      []WalkItem
 	components []string
-	routes     []string
+	routes     []RouteData
 }
 
 func (m *Manifest) init(opts ...Option) {
@@ -35,9 +40,39 @@ func (m *Manifest) init(opts ...Option) {
 	}
 }
 
-func (m *Manifest) Create(opts ...Option) {
+func (m *Manifest) initDefault() {
+	m.defaultLayout = m.defaultComp("components/layout.svelte")
+	m.defaultError = m.defaultComp("components/error.svelte")
+}
+
+func (m *Manifest) Create(opts ...Option) error {
 	m.init(opts...)
 
+	m.initDefault()
+
+	routes := m.opts.Conf.Kit.Files.Routes
+
+	base := filepath.Relative(m.opts.Cwd, routes)
+	layoutPage := m.findLayout("__layout", base, m.defaultLayout)
+	layoutError := m.findLayout("__error", base, m.defaultError)
+
+	m.components = append(m.components, layoutPage, layoutError)
+
+	if err := m.walk(routes, [][]*RouteSegment{}, []string{}, []string{layoutPage}, []string{layoutError}); err != nil {
+		return err
+	}
+
+	manifestContent, _ := json.Marshal(m.routes)
+
+	manifestPath := fmt.Sprintf("%s/manifest_app.json", m.opts.Cwd)
+	log.Println("manifestPath", manifestPath)
+	f, _ := os.Create(manifestPath)
+	defer f.Close()
+
+	n, _ := f.Write(manifestContent)
+	log.Printf("wrote %d bytes\n", n)
+
+	return nil
 }
 
 func New(option ...Option) *Manifest {
@@ -45,27 +80,4 @@ func New(option ...Option) *Manifest {
 	manifest.init(option...)
 
 	return manifest
-}
-
-// CreateManifest
-func CreateManifest(conf config.Config, output, cwd string) ManifestData {
-	if cwd == "" {
-		cwd = filepath.CWD()
-	}
-
-	var components []string
-	var routes []RouteData
-
-	defaultLayout := path.Join(cwd, output, "components/layout.svelte")
-	defaultError := path.Join(cwd, output, "components/error.svelte")
-
-	base := path.Join(cwd, config.Kit.Files.Routes)
-	layoutPage := findLayout("__layout", base, config.Extensions, defaultLayout)
-	layoutError := findLayout("__error", base, config.Extensions, defaultError)
-
-	components = append(components, layoutPage, layoutError)
-
-	walk(base, [][]RouteSegment{}, []string{}, []string{layoutPage}, []string{layoutError})
-
-	return ManifestData{}
 }

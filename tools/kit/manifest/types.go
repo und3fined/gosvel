@@ -4,7 +4,7 @@
  * File Created: 11 Jan 2022 21:26:12
  * Author: und3fined (me@und3fined.com)
  * -----
- * Last Modified: 11 Jan 2022 22:13:23
+ * Last Modified: 12 Jan 2022 17:34:28
  * Modified By: und3fined (me@und3fined.com)
  * -----
  * Copyright (c) 2022 und3fined.com
@@ -27,14 +27,14 @@ type RouteSegment struct {
 }
 
 type RouteData struct {
-	Type     RouteDataType  `json:"type"`
-	Segments []RouteSegment `json:"segments"`
-	Pattern  regexp.Regexp  `json:"pattern"`
-	Params   []string       `json:"params"`
-	Path     string         `json:"path,omitempty"`
-	File     string         `json:"file,omitempty"`
-	A        []string       `json:"a,omitempty"`
-	B        []string       `json:"b,omitempty"`
+	Type     RouteDataType   `json:"type"`
+	Segments []*RouteSegment `json:"segments"`
+	Pattern  *regexp.Regexp  `json:"pattern"`
+	Params   []string        `json:"params"`
+	Path     string          `json:"path,omitempty"`
+	File     string          `json:"file,omitempty"`
+	A        []string        `json:"a,omitempty"`
+	B        []string        `json:"b,omitempty"`
 }
 
 type Asset struct {
@@ -54,7 +54,7 @@ type ManifestData struct {
 type WalkItem struct {
 	Basename    string
 	Ext         string
-	Parts       []RouteSegment
+	Parts       []*RouteSegment
 	File        string
 	IsDir       bool
 	IsIndex     bool
