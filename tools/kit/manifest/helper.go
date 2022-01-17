@@ -4,7 +4,7 @@
  * File Created: 11 Jan 2022 21:48:31
  * Author: und3fined (me@und3fined.com)
  * -----
- * Last Modified: 12 Jan 2022 22:42:17
+ * Last Modified: 17 Jan 2022 17:21:42
  * Modified By: und3fined (me@und3fined.com)
  * -----
  * Copyright (c) 2022 und3fined.com
@@ -33,7 +33,8 @@ var specials = []string{"__layout", "__layout.reset", "__error"}
 var reTmpFile = regexp.MustCompile(`^(\.[a-z0-9]+)+$`)
 var rePart = regexp.MustCompile(`\[(.+?\(.+?\)|.+?)\]`)
 var reRestContent = regexp.MustCompile(`^\.{3}.+$`)
-var reParseContent = regexp.MustCompile(`([^(]+)$`)
+
+// var reParseContent = regexp.MustCompile(`([^(]+)$`)
 var reValidContent = regexp.MustCompile(`^(\.\.\.)?[a-zA-Z0-9_$]+$`)
 
 func (m *Manifest) defaultComp(fileComp string) string {
@@ -58,6 +59,7 @@ func (m *Manifest) findLayout(fileName, dir string, defaultLayout string) string
 func (m *Manifest) walk(dir string, parentSegments [][]*RouteSegment, parentParams []string, layoutStack []string, errorStack []string) error {
 	log.Printf("\n\n---------\n\nStart walk: %s", dir)
 
+	var items []WalkItem
 	cwd := m.opts.Cwd
 	extensions := m.opts.Conf.Extensions
 
@@ -68,8 +70,6 @@ func (m *Manifest) walk(dir string, parentSegments [][]*RouteSegment, parentPara
 
 	for _, fInfo := range files {
 		basename := fInfo.Name()
-
-		log.Println("basename", basename)
 
 		resolved := path.Join(dir, basename)
 		file := filepath.Relative(cwd, resolved)
@@ -93,7 +93,6 @@ func (m *Manifest) walk(dir string, parentSegments [][]*RouteSegment, parentPara
 			if name[1:2] == "_" && !contains(specials, name) {
 				return fmt.Errorf("Files and directories prefixed with __ are reserved (saw %s)", fInfo.Name())
 			}
-
 			continue
 		}
 
@@ -126,7 +125,7 @@ func (m *Manifest) walk(dir string, parentSegments [][]*RouteSegment, parentPara
 			routeSuffix = basename[dotIndex:endIndex]
 		}
 
-		m.items = append(m.items, WalkItem{
+		items = append(items, WalkItem{
 			Basename:    basename,
 			Ext:         ext,
 			Parts:       parts,
@@ -138,12 +137,12 @@ func (m *Manifest) walk(dir string, parentSegments [][]*RouteSegment, parentPara
 		})
 	}
 
-	sort.Slice(m.items, m.comparator)
+	sort.Slice(items, m.comparator(items))
 
-	for _, item := range m.items {
+	for _, item := range items {
+		log.Println("Item", item.Basename)
+
 		segments := parentSegments
-
-		log.Println("Item:", item.Basename, "index", item.IsIndex)
 
 		if item.IsIndex {
 			if item.RouteSuffix != "" {
@@ -237,6 +236,8 @@ func (m *Manifest) walk(dir string, parentSegments [][]*RouteSegment, parentPara
 				continue
 			}
 		} else if item.IsPage {
+			log.Println("item.File", item.File)
+
 			m.components = append(m.components, item.File)
 
 			concatenated := append(layoutStack, item.File)
@@ -246,21 +247,19 @@ func (m *Manifest) walk(dir string, parentSegments [][]*RouteSegment, parentPara
 
 			i := len(concatenated)
 
-			log.Printf("I: %d", i)
-			log.Printf("concatenated: %s", concatenated)
-			log.Printf("layoutErrors: %s", layoutErrors)
+			for ; i >= 0; i-- {
+				index := i - 1
 
-			for ; i > 0; i-- {
-				log.Printf("I2: %d", i)
+				log.Printf("I2: %d", index)
 
-				layoutErr := getItem(layoutErrors, i)
-				layoutPage := getItem(concatenated, i)
+				layoutErr := getItem(layoutErrors, index)
+				layoutPage := getItem(concatenated, index)
 
 				log.Printf("I2: %s %s", layoutErr, layoutPage)
 
 				if layoutErr == "" && layoutPage == "" {
-					layoutErrors = layoutErrors[:i-1]
-					concatenated = concatenated[:i-1]
+					layoutErrors = layoutErrors[:index]
+					concatenated = concatenated[:index]
 				}
 			}
 
@@ -309,9 +308,11 @@ func (m *Manifest) walk(dir string, parentSegments [][]*RouteSegment, parentPara
 }
 
 func (m *Manifest) getParts(part, file string) []*RouteSegment {
+	log.Printf("getParts: %s - %s", part, file)
+
 	var result []*RouteSegment
 
-	parts := rePart.FindStringSubmatch(part)
+	parts := rePart.FindAllStringSubmatch(part, -1)
 
 	if len(parts) == 0 {
 		result = append(result, &RouteSegment{
@@ -323,90 +324,90 @@ func (m *Manifest) getParts(part, file string) []*RouteSegment {
 		return result
 	}
 
-	for i, str := range parts {
-		dynamic := i%2 == 0
-		content := str
-		validContent := true
-
-		if dynamic {
-			tmpContent := reParseContent.FindStringSubmatch(str)
-			if len(tmpContent) > 0 {
-				content = tmpContent[0]
-			}
-			validContent = reValidContent.MatchString(content)
-		}
-
-		if content == "" || (dynamic && !validContent) {
+	for _, part := range parts {
+		if !reValidContent.MatchString(part[1]) {
 			log.Fatalln(fmt.Errorf("Invalid route %s — parameter name must match /^[a-zA-Z0-9_$]+$/", file))
 		}
 
-		log.Println("Get partsconen", content, dynamic)
+		result = append(result, &RouteSegment{
+			Content: part[1],
+			Dynamic: true,
+			Rest:    reRestContent.MatchString(part[1]),
+		})
+	}
+
+	for _, part := range rePart.Split(part, -1) {
+		if part == "" {
+			continue
+		}
 
 		result = append(result, &RouteSegment{
-			Content: content,
-			Dynamic: dynamic,
-			Rest:    dynamic && reRestContent.MatchString(content),
+			Content: part,
+			Dynamic: false,
+			Rest:    false,
 		})
 	}
 
 	return result
 }
 
-func (m *Manifest) comparator(i, j int) bool {
-	a := m.items[i]
-	b := m.items[j]
+func (m *Manifest) comparator(items []WalkItem) func(i, j int) bool {
+	return func(i, j int) bool {
+		a := items[i]
+		b := items[j]
 
-	if a.IsIndex != b.IsIndex {
-		if a.IsIndex {
-			return isSpread(a.File)
-		}
-		return !isSpread(b.File)
-	}
-
-	max := math.Max(float64(len(a.Parts)), float64(len(b.Parts)))
-
-	for i := 0; i < int(max); i++ {
-		a_sub_part := a.Parts[i]
-		b_sub_part := b.Parts[i]
-
-		if a_sub_part == nil {
-			return true
+		if a.IsIndex != b.IsIndex {
+			if a.IsIndex {
+				return isSpread(a.File)
+			}
+			return !isSpread(b.File)
 		}
 
-		if b_sub_part == nil {
-			return false
-		}
+		max := math.Max(float64(len(a.Parts)), float64(len(b.Parts)))
 
-		if a_sub_part.Rest && b_sub_part.Rest {
-			if a.IsPage != b.IsPage {
-				return a.IsPage
+		for i := 0; i < int(max); i++ {
+			a_sub_part := a.Parts[i]
+			b_sub_part := b.Parts[i]
+
+			if a_sub_part == nil {
+				return true
 			}
 
-			return !(a_sub_part.Content < b_sub_part.Content)
-		}
+			if b_sub_part == nil {
+				return false
+			}
 
-		if a_sub_part.Rest != b_sub_part.Rest {
-			return a_sub_part.Rest
-		}
+			if a_sub_part.Rest && b_sub_part.Rest {
+				if a.IsPage != b.IsPage {
+					return a.IsPage
+				}
 
-		if a_sub_part.Dynamic != b_sub_part.Dynamic {
-			return a_sub_part.Dynamic
-		}
-
-		if !a_sub_part.Dynamic && a_sub_part.Content != b_sub_part.Content {
-			contentLen := len(b_sub_part.Content) - len(a_sub_part.Content)
-			if contentLen == 0 {
 				return !(a_sub_part.Content < b_sub_part.Content)
 			}
-			return contentLen > 0
+
+			if a_sub_part.Rest != b_sub_part.Rest {
+				return a_sub_part.Rest
+			}
+
+			if a_sub_part.Dynamic != b_sub_part.Dynamic {
+				return a_sub_part.Dynamic
+			}
+
+			if !a_sub_part.Dynamic && a_sub_part.Content != b_sub_part.Content {
+				contentLen := len(b_sub_part.Content) - len(a_sub_part.Content)
+				if contentLen == 0 {
+					return !(a_sub_part.Content < b_sub_part.Content)
+				}
+				return contentLen > 0
+			}
 		}
-	}
 
-	if a.IsPage != b.IsPage {
-		return a.IsPage
-	}
+		if a.IsPage != b.IsPage {
+			return a.IsPage
+		}
 
-	return !(a.File < b.File)
+		return !(a.File < b.File)
+	}
 }
 
 func isSpread(path string) bool {
@@ -497,8 +498,6 @@ func getPattern(segments [][]*RouteSegment, addTrailingSlash bool) *regexp.Regex
 			}
 		}
 	}
-
-	log.Printf("pattern: %s", strings.Join(pattern, ""))
 
 	return regexp.MustCompile(strings.Join(pattern, ""))
 }
