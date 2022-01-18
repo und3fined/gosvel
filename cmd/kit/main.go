@@ -4,7 +4,7 @@
  * File Created: 12 Jan 2022 10:47:26
  * Author: und3fined (me@und3fined.com)
  * -----
- * Last Modified: 12 Jan 2022 17:44:23
+ * Last Modified: 18 Jan 2022 14:25:34
  * Modified By: und3fined (me@und3fined.com)
  * -----
  * Copyright (c) 2022 und3fined.com
@@ -12,16 +12,19 @@
 package main
 
 import (
+	"log"
+	"os"
+	"path"
+
 	"gosvel/tools/kit/config"
 	"gosvel/tools/kit/manifest"
-	"gosvel/tools/kit/utils/filepath"
-	"log"
-	"path"
 )
 
 func main() {
-	cwd := filepath.CWD()
+	cwd, _ := os.Getwd()
 	buildDir := path.Join(cwd, ".gsvel/build")
+
+	log.Println("cwd", cwd)
 
 	conf := config.Config{
 		Extensions: []string{".svelte"},

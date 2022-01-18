@@ -4,7 +4,7 @@
  * File Created: 11 Jan 2022 21:26:12
  * Author: und3fined (me@und3fined.com)
  * -----
- * Last Modified: 12 Jan 2022 17:34:28
+ * Last Modified: 18 Jan 2022 14:28:34
  * Modified By: und3fined (me@und3fined.com)
  * -----
  * Copyright (c) 2022 und3fined.com
@@ -33,8 +33,8 @@ type RouteData struct {
 	Params   []string        `json:"params"`
 	Path     string          `json:"path,omitempty"`
 	File     string          `json:"file,omitempty"`
-	A        []string        `json:"a,omitempty"`
-	B        []string        `json:"b,omitempty"`
+	C        []string        `json:"c,omitempty"`
+	E        []string        `json:"e,omitempty"`
 }
 
 type Asset struct {

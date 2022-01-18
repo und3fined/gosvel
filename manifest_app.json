@@ -1,0 +1,89 @@
+[
+  {
+    "type": "endpoint",
+    "segments": [
+      {
+        "content": "todos",
+        "dynamic": false,
+        "rest": false
+      },
+      {
+        "content": "[uid].json",
+        "dynamic": true,
+        "rest": false
+      }
+    ],
+    "pattern": {},
+    "params": [
+      "uid"
+    ],
+    "file": "themes/default/routes/todos/[uid].json.ts"
+  },
+  {
+    "type": "page",
+    "segments": [
+      {
+        "content": "todos",
+        "dynamic": false,
+        "rest": false
+      }
+    ],
+    "pattern": {},
+    "params": [],
+    "path": "/todos",
+    "c": [
+      "/Users/und3finedM1/Project/Pri/gosvel/.gsvel/build/components/layout.svelte",
+      "themes/default/routes/todos/index.svelte"
+    ],
+    "e": [
+      "/Users/und3finedM1/Project/Pri/gosvel/.gsvel/build/components/error.svelte"
+    ]
+  },
+  {
+    "type": "endpoint",
+    "segments": [
+      {
+        "content": "todos.json",
+        "dynamic": false,
+        "rest": false
+      }
+    ],
+    "pattern": {},
+    "params": [],
+    "file": "themes/default/routes/todos/index.json.ts"
+  },
+  {
+    "type": "page",
+    "segments": [
+      {
+        "content": "about",
+        "dynamic": false,
+        "rest": false
+      }
+    ],
+    "pattern": {},
+    "params": [],
+    "path": "/about",
+    "c": [
+      "/Users/und3finedM1/Project/Pri/gosvel/.gsvel/build/components/layout.svelte",
+      "themes/default/routes/about.svelte"
+    ],
+    "e": [
+      "/Users/und3finedM1/Project/Pri/gosvel/.gsvel/build/components/error.svelte"
+    ]
+  },
+  {
+    "type": "page",
+    "segments": null,
+    "pattern": {},
+    "params": [],
+    "path": "/",
+    "c": [
+      "/Users/und3finedM1/Project/Pri/gosvel/.gsvel/build/components/layout.svelte",
+      "themes/default/routes/index.svelte"
+    ],
+    "e": [
+      "/Users/und3finedM1/Project/Pri/gosvel/.gsvel/build/components/error.svelte"
+    ]
+  }
+]

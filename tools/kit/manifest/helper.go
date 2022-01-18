@@ -4,7 +4,7 @@
  * File Created: 11 Jan 2022 21:48:31
  * Author: und3fined (me@und3fined.com)
  * -----
- * Last Modified: 18 Jan 2022 11:59:59
+ * Last Modified: 18 Jan 2022 14:28:52
  * Modified By: und3fined (me@und3fined.com)
  * -----
  * Copyright (c) 2022 und3fined.com
@@ -27,7 +27,7 @@ import (
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 
-	"gosvel/tools/kit/utils/filepath"
+	"gosvel/tools/utils/filepath"
 )
 
 var specials = []string{"__layout", "__layout.reset", "__error"}
@@ -73,7 +73,7 @@ func (m *Manifest) walk(dir string, parentSegments [][]*RouteSegment, parentPara
 		basename := fInfo.Name()
 
 		resolved := path.Join(dir, basename)
-		file := filepath.Relative(cwd, resolved)
+		file := filepath.Relative(cwd, cwd, resolved)
 		isDir := fInfo.IsDir()
 
 		ext := findString(extensions, func(item string) bool {
@@ -284,8 +284,8 @@ func (m *Manifest) walk(dir string, parentSegments [][]*RouteSegment, parentPara
 				Pattern:  rePattern,
 				Params:   params,
 				Path:     path,
-				A:        concatenated,
-				B:        layoutErrors,
+				C:        concatenated,
+				E:        layoutErrors,
 			})
 		} else {
 			pattern := getPattern(segments, item.RouteSuffix == "")

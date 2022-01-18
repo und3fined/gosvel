@@ -4,7 +4,7 @@
  * File Created: 11 Jan 2022 21:40:17
  * Author: und3fined (me@und3fined.com)
  * -----
- * Last Modified: 12 Jan 2022 10:34:16
+ * Last Modified: 18 Jan 2022 14:26:26
  * Modified By: und3fined (me@und3fined.com)
  * -----
  * Copyright (c) 2022 und3fined.com
@@ -28,8 +28,8 @@ func CWD() string {
 	return filepath.Dir(ex)
 }
 
-func Relative(from, to string) string {
-	to = filepath.Join(CWD(), to)
+func Relative(cwd, from, to string) string {
+	to = filepath.Join(cwd, to)
 	nextPath, _ := filepath.Rel(from, to)
 	return nextPath
 }

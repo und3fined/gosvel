@@ -4,7 +4,7 @@
  * File Created: 11 Jan 2022 20:39:41
  * Author: und3fined (me@und3fined.com)
  * -----
- * Last Modified: 12 Jan 2022 17:43:22
+ * Last Modified: 18 Jan 2022 14:29:39
  * Modified By: und3fined (me@und3fined.com)
  * -----
  * Copyright (c) 2022 und3fined.com
@@ -14,7 +14,7 @@ package manifest
 import (
 	"encoding/json"
 	"fmt"
-	"gosvel/tools/kit/utils/filepath"
+	"gosvel/tools/utils/filepath"
 	"log"
 	"os"
 )
@@ -25,7 +25,6 @@ type Manifest struct {
 	defaultLayout string
 	defaultError  string
 
-	items      []WalkItem
 	components []string
 	routes     []RouteData
 }
@@ -52,7 +51,7 @@ func (m *Manifest) Create(opts ...Option) error {
 
 	routes := m.opts.Conf.Kit.Files.Routes
 
-	base := filepath.Relative(m.opts.Cwd, routes)
+	base := filepath.Relative(m.opts.Cwd, m.opts.Cwd, routes)
 	layoutPage := m.findLayout("__layout", base, m.defaultLayout)
 	layoutError := m.findLayout("__error", base, m.defaultError)
 
@@ -62,7 +61,7 @@ func (m *Manifest) Create(opts ...Option) error {
 		return err
 	}
 
-	manifestContent, _ := json.Marshal(m.routes)
+	manifestContent, _ := json.MarshalIndent(m.routes, "", "  ")
 
 	manifestPath := fmt.Sprintf("%s/manifest_app.json", m.opts.Cwd)
 	log.Println("manifestPath", manifestPath)
