@@ -4,7 +4,7 @@
  * File Created: 11 Jan 2022 21:48:31
  * Author: und3fined (me@und3fined.com)
  * -----
- * Last Modified: 17 Jan 2022 22:27:26
+ * Last Modified: 18 Jan 2022 11:59:59
  * Modified By: und3fined (me@und3fined.com)
  * -----
  * Copyright (c) 2022 und3fined.com
@@ -233,7 +233,7 @@ func (m *Manifest) walk(dir string, parentSegments [][]*RouteSegment, parentPara
 				layoutStack,
 				errorStack,
 			)
-			if err.Error() == "no such file or directory" {
+			if err != nil && err.Error() == "no such file or directory" {
 				continue
 			}
 		} else if item.IsPage {
@@ -248,38 +248,34 @@ func (m *Manifest) walk(dir string, parentSegments [][]*RouteSegment, parentPara
 
 			i := len(concatenated)
 
-			for ; i >= 0; i-- {
-				index := i - 1
-
-				log.Printf("I2: %d", index)
-
-				layoutErr := getItem(layoutErrors, index)
-				layoutPage := getItem(concatenated, index)
-
-				log.Printf("I2: %s %s", layoutErr, layoutPage)
-
-				if layoutErr == "" && layoutPage == "" {
-					layoutErrors = layoutErrors[:index]
-					concatenated = concatenated[:index]
+			for i >= 0 {
+				i--
+				if !sliceExists(layoutErrors, i) && !sliceExists(concatenated, i) {
+					layoutErrors = splice(layoutErrors, i, 1)
+					concatenated = splice(concatenated, i, 1)
 				}
 			}
 
 			i = len(layoutErrors)
-			for ; i >= 0; i-- {
-				if layoutErrors[i] != "" {
+			for i >= 0 {
+				i--
+				if sliceExists(layoutErrors, i) {
 					break
 				}
 			}
 
-			layoutErrors = layoutErrors[:i+1]
+			layoutErrors = splice(layoutErrors, i+1, 0)
 
 			path := ""
 			if every(segments, func(segment []*RouteSegment) bool {
 				return len(segment) == 1 && !segment[0].Dynamic
 			}) {
+				var tmp []string
 				for _, segment := range segments {
-					path += segment[0].Content
+					tmp = append(tmp, segment[0].Content)
 				}
+
+				path = fmt.Sprintf("/%s", strings.Join(tmp, "/"))
 			}
 
 			m.routes = append(m.routes, RouteData{
@@ -509,10 +505,25 @@ func normalize(str string) string {
 	return result
 }
 
-func getItem(arr []string, i int) string {
-	if len(arr) < i || i > len(arr) {
-		return ""
+func sliceExists(arr []string, i int) bool {
+	return !(i > len(arr)-1)
+}
+
+func splice(arr []string, index int, length int) []string {
+	if length == 0 {
+		if index > len(arr) {
+			return arr
+		}
+
+		return arr[:index]
 	}
 
-	return arr[i]
+	var result []string
+	for i, val := range arr {
+		if i < index || i > index+length-1 {
+			result = append(result, val)
+		}
+	}
+
+	return result
 }
