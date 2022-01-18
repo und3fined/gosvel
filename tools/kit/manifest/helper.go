@@ -4,7 +4,7 @@
  * File Created: 11 Jan 2022 21:48:31
  * Author: und3fined (me@und3fined.com)
  * -----
- * Last Modified: 17 Jan 2022 17:21:42
+ * Last Modified: 17 Jan 2022 22:27:26
  * Modified By: und3fined (me@und3fined.com)
  * -----
  * Copyright (c) 2022 und3fined.com
@@ -13,7 +13,6 @@ package manifest
 
 import (
 	"fmt"
-	"gosvel/tools/kit/utils/filepath"
 	"io/ioutil"
 	"log"
 	"math"
@@ -27,6 +26,8 @@ import (
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
+
+	"gosvel/tools/kit/utils/filepath"
 )
 
 var specials = []string{"__layout", "__layout.reset", "__error"}
