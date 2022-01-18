@@ -4,7 +4,7 @@
  * File Created: 11 Jan 2022 21:48:31
  * Author: und3fined (me@und3fined.com)
  * -----
- * Last Modified: 18 Jan 2022 14:28:52
+ * Last Modified: 18 Jan 2022 14:35:15
  * Modified By: und3fined (me@und3fined.com)
  * -----
  * Copyright (c) 2022 und3fined.com
@@ -58,8 +58,6 @@ func (m *Manifest) findLayout(fileName, dir string, defaultLayout string) string
 }
 
 func (m *Manifest) walk(dir string, parentSegments [][]*RouteSegment, parentParams []string, layoutStack []string, errorStack []string) error {
-	log.Printf("\n\n---------\n\nStart walk: %s", dir)
-
 	var items []WalkItem
 	cwd := m.opts.Cwd
 	extensions := m.opts.Conf.Extensions
@@ -141,8 +139,6 @@ func (m *Manifest) walk(dir string, parentSegments [][]*RouteSegment, parentPara
 	sort.Slice(items, m.comparator(items))
 
 	for _, item := range items {
-		log.Println("Item", item.Basename)
-
 		segments := parentSegments
 
 		if item.IsIndex {
@@ -237,8 +233,6 @@ func (m *Manifest) walk(dir string, parentSegments [][]*RouteSegment, parentPara
 				continue
 			}
 		} else if item.IsPage {
-			log.Println("item.File", item.File)
-
 			m.components = append(m.components, item.File)
 
 			concatenated := append(layoutStack, item.File)
@@ -305,8 +299,6 @@ func (m *Manifest) walk(dir string, parentSegments [][]*RouteSegment, parentPara
 }
 
 func (m *Manifest) getParts(part, file string) []*RouteSegment {
-	log.Printf("getParts: %s - %s", part, file)
-
 	var result []*RouteSegment
 
 	parts := rePart.FindAllStringSubmatch(part, -1)
@@ -469,7 +461,7 @@ func generateContent(segment []*RouteSegment) string {
 	return strings.Join(content, "")
 }
 
-func getPattern(segments [][]*RouteSegment, addTrailingSlash bool) *regexp.Regexp {
+func getPattern(segments [][]*RouteSegment, addTrailingSlash bool) string {
 	var pattern []string
 
 	for _, segment := range segments {
@@ -496,7 +488,8 @@ func getPattern(segments [][]*RouteSegment, addTrailingSlash bool) *regexp.Regex
 		}
 	}
 
-	return regexp.MustCompile(strings.Join(pattern, ""))
+	re := regexp.MustCompile(strings.Join(pattern, ""))
+	return re.String()
 }
 
 func normalize(str string) string {

@@ -1,5 +1,31 @@
 [
   {
+    "type": "page",
+    "segments": [
+      {
+        "content": "dyn",
+        "dynamic": false,
+        "rest": false
+      },
+      {
+        "content": "[id]",
+        "dynamic": true,
+        "rest": false
+      }
+    ],
+    "pattern": "\\/dyn\\/([^/]+?)",
+    "params": [
+      "id"
+    ],
+    "c": [
+      "/Users/und3finedM1/Project/Pri/gosvel/.gsvel/build/components/layout.svelte",
+      "themes/default/routes/dyn/[id].svelte"
+    ],
+    "e": [
+      "/Users/und3finedM1/Project/Pri/gosvel/.gsvel/build/components/error.svelte"
+    ]
+  },
+  {
     "type": "endpoint",
     "segments": [
       {
@@ -13,7 +39,7 @@
         "rest": false
       }
     ],
-    "pattern": {},
+    "pattern": "\\/todos\\/([^/]+?)\\$\u0026json",
     "params": [
       "uid"
     ],
@@ -28,7 +54,7 @@
         "rest": false
       }
     ],
-    "pattern": {},
+    "pattern": "\\/todos",
     "params": [],
     "path": "/todos",
     "c": [
@@ -48,7 +74,7 @@
         "rest": false
       }
     ],
-    "pattern": {},
+    "pattern": "\\/todos\\$\u0026json",
     "params": [],
     "file": "themes/default/routes/todos/index.json.ts"
   },
@@ -61,7 +87,7 @@
         "rest": false
       }
     ],
-    "pattern": {},
+    "pattern": "\\/about",
     "params": [],
     "path": "/about",
     "c": [
@@ -75,7 +101,7 @@
   {
     "type": "page",
     "segments": null,
-    "pattern": {},
+    "pattern": "",
     "params": [],
     "path": "/",
     "c": [

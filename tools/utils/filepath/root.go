@@ -4,7 +4,7 @@
  * File Created: 11 Jan 2022 21:40:17
  * Author: und3fined (me@und3fined.com)
  * -----
- * Last Modified: 18 Jan 2022 14:26:26
+ * Last Modified: 18 Jan 2022 16:46:53
  * Modified By: und3fined (me@und3fined.com)
  * -----
  * Copyright (c) 2022 und3fined.com
@@ -29,7 +29,10 @@ func CWD() string {
 }
 
 func Relative(cwd, from, to string) string {
-	to = filepath.Join(cwd, to)
+	if !strings.HasPrefix(to, cwd) {
+		to = filepath.Join(cwd, to)
+	}
+
 	nextPath, _ := filepath.Rel(from, to)
 	return nextPath
 }

@@ -4,14 +4,12 @@
  * File Created: 11 Jan 2022 21:26:12
  * Author: und3fined (me@und3fined.com)
  * -----
- * Last Modified: 18 Jan 2022 14:28:34
+ * Last Modified: 18 Jan 2022 15:33:36
  * Modified By: und3fined (me@und3fined.com)
  * -----
  * Copyright (c) 2022 und3fined.com
  */
 package manifest
-
-import "regexp"
 
 type RouteDataType string
 
@@ -29,7 +27,7 @@ type RouteSegment struct {
 type RouteData struct {
 	Type     RouteDataType   `json:"type"`
 	Segments []*RouteSegment `json:"segments"`
-	Pattern  *regexp.Regexp  `json:"pattern"`
+	Pattern  string          `json:"pattern"`
 	Params   []string        `json:"params"`
 	Path     string          `json:"path,omitempty"`
 	File     string          `json:"file,omitempty"`
@@ -39,7 +37,7 @@ type RouteData struct {
 
 type Asset struct {
 	File string `json:"file"`             // file: string;
-	Side int    `json:"size"`             //size: number;
+	Size int64  `json:"size"`             //size: number;
 	Type string `json:"string,omitempty"` //type: string | null;
 }
 

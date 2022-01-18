@@ -4,7 +4,7 @@
  * File Created: 11 Jan 2022 20:39:41
  * Author: und3fined (me@und3fined.com)
  * -----
- * Last Modified: 18 Jan 2022 14:29:39
+ * Last Modified: 18 Jan 2022 16:09:33
  * Modified By: und3fined (me@und3fined.com)
  * -----
  * Copyright (c) 2022 und3fined.com
@@ -12,11 +12,7 @@
 package manifest
 
 import (
-	"encoding/json"
-	"fmt"
 	"gosvel/tools/utils/filepath"
-	"log"
-	"os"
 )
 
 type Manifest struct {
@@ -44,7 +40,7 @@ func (m *Manifest) initDefault() {
 	m.defaultError = m.defaultComp("components/error.svelte")
 }
 
-func (m *Manifest) Create(opts ...Option) error {
+func (m *Manifest) Create(opts ...Option) (*ManifestData, error) {
 	m.init(opts...)
 
 	m.initDefault()
@@ -58,20 +54,18 @@ func (m *Manifest) Create(opts ...Option) error {
 	m.components = append(m.components, layoutPage, layoutError)
 
 	if err := m.walk(routes, [][]*RouteSegment{}, []string{}, []string{layoutPage}, []string{layoutError}); err != nil {
-		return err
+		return nil, err
 	}
 
-	manifestContent, _ := json.MarshalIndent(m.routes, "", "  ")
+	assets := m.getAssets(m.opts.Cwd, m.opts.Conf.Kit.Files.Assets)
 
-	manifestPath := fmt.Sprintf("%s/manifest_app.json", m.opts.Cwd)
-	log.Println("manifestPath", manifestPath)
-	f, _ := os.Create(manifestPath)
-	defer f.Close()
-
-	n, _ := f.Write(manifestContent)
-	log.Printf("wrote %d bytes\n", n)
-
-	return nil
+	return &ManifestData{
+		Assets:     assets,
+		Layout:     layoutPage,
+		Error:      layoutError,
+		Components: m.components,
+		Routes:     m.routes,
+	}, nil
 }
 
 func New(option ...Option) *Manifest {
